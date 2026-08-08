@@ -52,6 +52,7 @@ link() {
 if [ "$DO_SYMLINKS" -eq 1 ]; then
   echo "==> Linking configs"
   link "$REPO_DIR/shell/.bashrc"   "$HOME/.bashrc"
+  link "$REPO_DIR/shell/agentrc.sh" "$HOME/.agentrc"
   link "$REPO_DIR/starship.toml"   "$HOME/.config/starship.toml"
   link "$REPO_DIR/wezterm.lua"     "$HOME/.config/wezterm/wezterm.lua"
   link "$REPO_DIR/nvim"            "$HOME/.config/nvim"
@@ -85,6 +86,7 @@ install_tools() {
         # Starship + nvim are newer than apt's copies; prefer the official binaries.
       elif command -v pacman >/dev/null; then
         sudo pacman -S --needed --noconfirm git curl fzf starship neovim tmux
+        # Add -s ollama to use the distro package if you prefer (optional).
       elif command -v dnf >/dev/null; then
         sudo dnf install -y git curl fzf starship neovim tmux
       fi
@@ -107,12 +109,33 @@ fi
 # ---------------------------------------------------------------------------
 # Optional: ble.sh + atuin (not always in package managers)
 # ---------------------------------------------------------------------------
+install_ollama() {
+  if command -v ollama >/dev/null; then
+    echo "  ~ ollama already installed"
+    return
+  fi
+  if confirm "Install Ollama (local LLM runtime for the always-on agent)?"; then
+    if command -v brew >/dev/null; then
+      brew install --cask ollama
+    else
+      curl -fsSL https://ollama.com/install.sh | sh
+    fi
+  fi
+}
+
 if [ "$INSTALL_TOOLS" -eq 1 ]; then
+  install_ollama
   if [ ! -f "$HOME/.local/share/blesh/ble.sh" ] && confirm "Install ble.sh (bash autosuggestions)?"; then
-    curl -fsSL https://raw.githubusercontent.com/akinomyoga/ble.sh/master/install.sh | bash
+    # ble.sh dropped its old root install.sh; build from source instead.
+    # https://github.com/akinomyoga/ble.sh#get-from-source
+    tmp_dir="$(mktemp -d)"
+    git clone --recursive --depth 1 --shallow-submodules \
+      https://github.com/akinomyoga/ble.sh.git "$tmp_dir/ble.sh"
+    make -C "$tmp_dir/ble.sh" install PREFIX="$HOME/.local"
+    rm -rf "$tmp_dir"
   fi
   if ! command -v atuin >/dev/null && confirm "Install atuin (fuzzy history)?"; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.atuin.sh | sh
+    curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh | sh
   fi
 fi
 

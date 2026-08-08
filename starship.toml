@@ -2,7 +2,11 @@
 # Shared across bash, zsh, fish on every OS. Lives in the dotfiles repo,
 # symlinked to ~/.config/starship.toml
 #
-# Palette based on Catppuccin Mocha to match the terminal + nvim.
+# Based on Catppuccin Mocha colours with Nerd Font symbols to match the terminal
+# + nvim. Additional Nerd Font symbols ((nerd-font-symbols preset) appended below.
+
+# Top-level format lives BEFORE every section so it applies to the whole prompt.
+format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$character"
 
 [character]
 success_symbol = "[❯](bold green)"
@@ -16,7 +20,7 @@ truncation_symbol = "…/"
 symbol = " "
 
 [git_status]
-symbol = " "
+format = "[$all_status$conflicted$ahead_behind]($style) "
 
 [python]
 symbol = " "
@@ -34,6 +38,65 @@ format = "took [$duration]($style) "
 [os]
 disabled = false
 style = "bold white"
+[os.symbols]
+AIX = " "
+AlmaLinux = " "
+Alpaquita = " "
+Alpine = " "
+ALTLinux = " "
+Amazon = " "
+Android = " "
+AOSC = " "
+Arch = " "
+Artix = " "
+Bluefin = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Elementary = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = " "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = " "
+InstantOS = " "
+Ios = "󰀷 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = " "
+OpenCloudOS = " "
+openEuler = " "
+openSUSE = " "
+OracleLinux = "󰺡 "
+PikaOS = " "
+Pop = " "
+Raspbian = " "
+Redhat = "󱄛 "
+RedHatEnterprise = "󱄛 "
+Redox = "󰀘 "
+RockyLinux = " "
+Solus = " "
+SUSE = " "
+Ubuntu = " "
+Ultramarine = " "
+Unknown = " "
+Uos = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
 
 [username]
 show_always = false
@@ -51,11 +114,39 @@ symbol = " "
 
 [status]
 disabled = false
-symbol = "✗ "
+symbol = " "
 
 [time]
 disabled = true
 
-[format]
-# Minimal, informative, no clutter.
-format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$character"
+# --- Nerd Font symbols (nerd-font-symbols preset) ---
+
+[docker_context]
+symbol = " "
+
+[kubernetes]
+symbol = "󱃾 "
+
+[golang]
+symbol = " "
+
+[rust]
+symbol = "󱘗 "
+
+[lua]
+symbol = " "
+
+[aws]
+symbol = " "
+
+[gcloud]
+symbol = "󱇶 "
+
+[azure]
+symbol = " "
+
+[terraform]
+symbol = " "
+
+[elixir]
+symbol = " "
