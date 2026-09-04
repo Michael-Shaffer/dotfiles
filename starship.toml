@@ -6,7 +6,11 @@
 # + nvim. Additional Nerd Font symbols ((nerd-font-symbols preset) appended below.
 
 # Top-level format lives BEFORE every section so it applies to the whole prompt.
-format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$line_break$character"
+# No $fill before $status. $fill pads to the right window edge so $status lands
+# there — but $status is empty after every successful command, so it was padding
+# ~78 spaces to align nothing, on every prompt. That whitespace also got swept
+# into any selection. Exit codes now sit inline, next to what you're reading.
+format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status$line_break$character"
 
 # λ is plain Unicode, so it renders without the Nerd Font fallback. Note that a
 # literal $ here would need escaping ('[\$](bold green)') — bare [$] parses as a
