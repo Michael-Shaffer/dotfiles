@@ -1,0 +1,18 @@
+# Machine-local values and secrets. These must never be committed — see
+# ai/README.md. The tracked template is ai/mcp/mcp.env.example.
+mcp.env
+*.env
+!*.env.example
+.agentrc.local
+
+# Backups written by bin/install.sh --adopt and ai/render.sh
+*.pre-dotfiles.*
+*.bak.*
+
+# Editor / OS noise
+*.swp
+.DS_Store
+
+# Python bytecode from ai/lib
+__pycache__/
+*.pyc

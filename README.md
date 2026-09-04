@@ -14,6 +14,7 @@ experience across home, work, and laptop — Linux, macOS, or Windows (WSL).
 | History          | (`atuin`, via .bashrc) | fuzzy ctrl-r, replaces bash history |
 | Editor          | `nvim/`              | Neovim: Catppuccin, Treesitter, explorer |
 | Multiplexer     | `tmux.conf`         | Persistent, reattachable agent sessions |
+| Agents          | `ai/`                | Claude Code settings + MCP servers      |
 
 ## Layout
 
@@ -23,7 +24,8 @@ experience across home, work, and laptop — Linux, macOS, or Windows (WSL).
 ├── shell/.bashrc
 ├── starship.toml
 ├── tmux.conf
-└── nvim/               entire nvim config (symlinked)
+├── nvim/               entire nvim config (symlinked)
+└── ai/                 Claude settings + MCP servers (see ai/README.md)
 ```
 
 ## Quick start
@@ -36,6 +38,35 @@ cd ~/dotfiles
 ```
 
 It never overwrites existing files — existing paths are skipped with a notice.
+On a machine that already has real configs where the symlinks go, use
+`--adopt`: each one is backed up to `<name>.pre-dotfiles.<timestamp>` and
+replaced with a link to the repo copy.
+
+Run it **inside WSL**, not Git Bash. Git Bash silently copies instead of
+symlinking unless Windows Developer Mode is on, which looks like success but
+means your edits never reach the repo. The installer detects this and stops.
+
+## Agent config (Claude Code / Claude Desktop)
+
+`ai/` holds the agent setup: `~/.claude/settings.json`, `~/.claude/commands/`,
+and a global `CLAUDE.md` are symlinked like everything else, while MCP servers
+are **rendered** into each client's config rather than symlinked.
+
+```sh
+cp ai/mcp/mcp.env.example ~/.config/dotfiles/mcp.env   # machine-local values
+chmod 600 ~/.config/dotfiles/mcp.env
+./ai/render.sh --list        # what was detected
+./ai/render.sh --dry-run     # diff, writes nothing
+./ai/render.sh               # apply
+```
+
+Rendering rather than linking, because the client config files mix the server
+list with machine state — Claude Desktop keeps account ids and window layout in
+the same JSON, and `~/.claude.json` is mostly session history. `render.sh`
+merges only the `mcpServers` key and backs the file up first. Server
+definitions also hold absolute paths and, eventually, API tokens; the tracked
+template carries `${PLACEHOLDERS}` and the real values stay in the untracked
+`mcp.env`. Full details in [ai/README.md](ai/README.md).
 
 ## Long-running agent sessions (tmux)
 

@@ -1,0 +1,32 @@
+{
+  "//": "Source of truth for MCP servers. Rendered into each client's config by ai/render.sh.",
+  "//variables": "${NAME} placeholders are filled from ~/.config/dotfiles/mcp.env (see mcp.env.example). Rendering fails loudly if one is unset — it never writes an empty string.",
+  "//secrets": "Never put a literal token here. Reference it as ${SOME_TOKEN} and define it in mcp.env, which is untracked and chmod 600.",
+
+  "mcpServers": {
+    "obsidian": {
+      "command": "${UV_BIN}",
+      "args": [
+        "--directory",
+        "${MCP_SRC_DIR}",
+        "run",
+        "--frozen",
+        "obsidian-mcp"
+      ],
+      "env": {
+        "OBSIDIAN_VAULT_PATH": "${OBSIDIAN_VAULT_PATH}"
+      }
+    },
+
+    "anki": {
+      "command": "${UV_BIN}",
+      "args": [
+        "--directory",
+        "${MCP_SRC_DIR}",
+        "run",
+        "--frozen",
+        "anki-mcp"
+      ]
+    }
+  }
+}
