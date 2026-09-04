@@ -35,7 +35,7 @@ __path_append "$HOME/.kimi-code/bin"
 if [ -d /mnt/c/Users ] && [ -z "${WINHOME:-}" ]; then
   for _w in /mnt/c/Users/*/; do
     case "$_w" in
-      */Public/|*/Default/|*/All\ Users/) ;;
+      */Public/|*/Default/|*/Default\ User/|*/All\ Users/) ;;
       *) WINHOME="$_w"; break ;;
     esac
   done

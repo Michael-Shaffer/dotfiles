@@ -6,7 +6,7 @@
 # + nvim. Additional Nerd Font symbols ((nerd-font-symbols preset) appended below.
 
 # Top-level format lives BEFORE every section so it applies to the whole prompt.
-format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$character"
+format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$line_break$character"
 
 [character]
 success_symbol = "[❯](bold green)"
