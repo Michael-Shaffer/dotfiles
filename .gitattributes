@@ -1,0 +1,32 @@
+# Line endings.
+#
+# This repo is checked out from both Windows (core.autocrlf=true, which writes
+# CRLF) and WSL (autocrlf unset, which doesn't). Without this file the two
+# disagree about every text file, and WSL reports the whole tree as modified —
+# which also means the prompt's git status counter can never reach zero.
+#
+# `text=auto eol=lf` makes both sides normalise to LF, so status is consistent
+# no matter which side last touched a file.
+* text=auto eol=lf
+
+# Shell scripts must be LF regardless: a CRLF shebang line makes the kernel
+# look for an interpreter named "bash\r", which fails with a confusing
+# "bad interpreter" error.
+*.sh    text eol=lf
+*.bash  text eol=lf
+
+# Windows-side files that genuinely want CRLF.
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Never normalise these.
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.ttf   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
