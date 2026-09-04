@@ -115,16 +115,33 @@ config.mouse_bindings = {
 config.keys = {
   { key = "Insert", mods = "CTRL", action = wezterm.action.CopyTo("Clipboard") },
   { key = "Insert", mods = "SHIFT", action = wezterm.action.PasteFrom("Clipboard") },
+  -- Pick which distro to open a tab in, without touching this file.
+  {
+    key = "d",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.ShowLauncherArgs({ flags = "FUZZY|DOMAINS" }),
+  },
 }
 
 -- ---------------------------------------------------------------------------
--- Launch: default shell
+-- Launch: WSL distros as domains
 -- ---------------------------------------------------------------------------
--- The terminal window runs on Windows, but we launch the Linux shell inside
--- WSL so the whole dev environment (bash, starship, tmux, nvim) is Linux.
--- Change the `-d` distro name when switching distros (e.g. ArchWSL).
+-- The terminal window runs on Windows, but the shell lives in WSL so the whole
+-- dev environment (bash, starship, tmux, nvim) is Linux.
+--
+-- Every installed distro is registered as its own domain rather than hardcoding
+-- one in default_prog. Install a new distro and it appears in the tab-bar "+"
+-- dropdown and the launcher with no edit here — only DEFAULT_DISTRO below picks
+-- which one a plain new tab opens.
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-  config.default_prog = { "wsl.exe", "-d", "Ubuntu-22.04", "--cd", "~", "--", "bash", "-l" }
+  local DEFAULT_DISTRO = "Ubuntu-22.04"
+
+  local domains = wezterm.default_wsl_domains()
+  for _, dom in ipairs(domains) do
+    dom.default_cwd = "~"
+  end
+  config.wsl_domains = domains
+  config.default_domain = "WSL:" .. DEFAULT_DISTRO
 end
 
 return config

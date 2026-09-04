@@ -8,19 +8,41 @@
 # Top-level format lives BEFORE every section so it applies to the whole prompt.
 format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$fill$status$line_break$character"
 
+# λ is plain Unicode, so it renders without the Nerd Font fallback. Note that a
+# literal $ here would need escaping ('[\$](bold green)') — bare [$] parses as a
+# variable reference, logs a warning to stderr, and silently drops the character.
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
+success_symbol = "[λ](bold green)"
+error_symbol = "[λ](bold red)"
 
 [directory]
 truncation_length = 3
 truncation_symbol = "…/"
+style = "bold green"
 
+# Context (os, branch, counts) sits in ANSI "bright black" — #8ca391 in the
+# WezTerm scheme, a muted sage. Using colour NAMES rather than hex means the
+# prompt follows the terminal theme instead of drifting from it.
 [git_branch]
 symbol = " "
+style = "bright-black"
 
+# Count first, then what it is: "2Δ" reads as "two modified". Δ is the standard
+# notation for change; the rest of the family uses git's own status letters
+# where it has them (? for untracked, R for renamed) so nothing needs decoding.
 [git_status]
+style = "green"
 format = "[$all_status$conflicted$ahead_behind]($style) "
+modified = "${count}Δ "
+staged = "${count}+ "
+untracked = "${count}? "
+deleted = "${count}− "
+renamed = "${count}R "
+stashed = "${count}≡ "
+conflicted = "${count}! "
+ahead = "${count}⇡ "
+behind = "${count}⇣ "
+diverged = "${ahead_count}⇡${behind_count}⇣ "
 
 [python]
 symbol = " "
@@ -37,7 +59,7 @@ format = "took [$duration]($style) "
 
 [os]
 disabled = false
-style = "bold white"
+style = "bright-black"
 [os.symbols]
 AIX = " "
 AlmaLinux = " "
