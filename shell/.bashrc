@@ -8,6 +8,21 @@ case $- in
       *) return;;
 esac
 
+# ---------------------------------------------------------------------------
+# ble.sh — syntax highlighting + fish-style autosuggestions.
+#
+# Must be sourced HERE, before anything touches the prompt, but with
+# --noattach so it doesn't take over yet. The matching ble-attach runs at the
+# very bottom, after Starship has installed its hooks.
+#
+# Order is the whole trick. Sourcing ble.sh at the bottom (or attaching early)
+# makes Starship and ble.sh both draw PS1 — a duplicated prompt with wide
+# Nerd Font glyphs double-counted. With --noattach here and ble-attach last,
+# they coexist: Starship owns the prompt, ble.sh owns the editing line.
+# ---------------------------------------------------------------------------
+[ -f "$HOME/.local/share/blesh/ble.sh" ] && \
+    source "$HOME/.local/share/blesh/ble.sh" --noattach
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -128,17 +143,62 @@ PROMPT_DIRTRIM=2
 [ -f "$HOME/.agentrc" ] && . "$HOME/.agentrc"
 
 # ---------------------------------------------------------------------------
-# Prompt: Starship (single prompt engine).
-#
-# In the past this file loaded Starship AND ble.sh, which gave a
-# duplicated/overlapping prompt (two engines both drawing PS1, made worse by
-# wide Nerd-Font glyphs being double-counted). Fix: use ONLY Starship here.
-# Enable ble.sh too (rarely needed), comment one of the two lines out.
+# Prompt: Starship.
 # ---------------------------------------------------------------------------
 if [ -x "$(command -v starship)" ]; then
     eval "$(starship init bash)"
 fi
 
-# Optional bash syntax highlighting + autosuggestions from ble.sh.
-# Enable ONLY if Starship is disabled above — they don't mix cleanly.
-# [ -f "$HOME/.local/share/blesh/ble.sh" ] && source "$HOME/.local/share/blesh/ble.sh"
+# ---------------------------------------------------------------------------
+# Blank line BETWEEN command blocks, but not above the first prompt on a fresh
+# or just-cleared screen.
+#
+# Starship's own add_newline can't do this — it has no state between prompts,
+# so it's all prompts or none (it's set to false in starship.toml for exactly
+# this reason). The rule we want is really "separate me from the previous
+# command's output", and on a clean screen there is no previous output.
+#
+# Ctrl-L and `clear` reset the flag so a cleared screen starts flush at the top.
+# ---------------------------------------------------------------------------
+__prompt_gap() {
+    [ -n "${__PROMPT_GAP_ARMED-}" ] && printf '\n'
+    __PROMPT_GAP_ARMED=1
+}
+# Hook via starship_precmd_user_func, NOT PROMPT_COMMAND. Starship's own init
+# warns that appending to PROMPT_COMMAND breaks exit-status ($?) checking and
+# prepending breaks the cmd_duration module; this hook is called from inside
+# starship_precmd at the right moment, after $? is restored and before PS1 is
+# built, so it sidesteps both.
+starship_precmd_user_func="__prompt_gap"
+
+# `clear` as a function so it resets the flag too; `command clear` still works.
+clear() { command clear "$@"; unset __PROMPT_GAP_ARMED; }
+
+# Ctrl-L bypasses the `clear` function above, so it needs the flag reset too.
+# ble.sh owns the keymap when loaded, so wrap its clear-screen widget; plain
+# readline otherwise.
+if [[ ${BLE_VERSION-} ]]; then
+    ble/widget/gap-clear-screen() {
+        unset __PROMPT_GAP_ARMED
+        ble/widget/clear-screen
+    }
+    ble-bind -f 'C-l' 'gap-clear-screen'
+else
+    bind -x '"\C-l": clear' 2>/dev/null
+fi
+
+# ---------------------------------------------------------------------------
+# Attach ble.sh LAST, once Starship's prompt hooks are installed. Pairs with
+# the --noattach source at the top of this file; see the note there for why
+# the order matters.
+# ---------------------------------------------------------------------------
+# ble.sh takes PROMPT_COMMAND over entirely — it unsets the real variable and
+# runs a stashed copy from inside its own prompt cycle — and it draws the first
+# prompt without that pass. So __prompt_gap first runs before prompt TWO, which
+# then gets treated as the first prompt and every gap lands one prompt late.
+# Arming here spends that allowance on the prompt ble.sh already drew. Plain
+# bash runs PROMPT_COMMAND before its first prompt, so it needs no help.
+if [[ ${BLE_VERSION-} ]]; then
+    ble-attach
+    __PROMPT_GAP_ARMED=1
+fi

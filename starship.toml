@@ -12,6 +12,12 @@
 # into any selection. Exit codes now sit inline, next to what you're reading.
 format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status$line_break$character"
 
+# No blank row before each prompt. Starship defaults this to true; it buys
+# separation between command blocks in dense scrollback, but costs a row at the
+# top of every cleared screen. Top-level keys must appear before the first
+# [table] below — put back as `add_newline = true` if the separation is missed.
+add_newline = false
+
 # λ is plain Unicode, so it renders without the Nerd Font fallback. Note that a
 # literal $ here would need escaping ('[\$](bold green)') — bare [$] parses as a
 # variable reference, logs a warning to stderr, and silently drops the character.
