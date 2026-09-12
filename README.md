@@ -42,6 +42,11 @@ On a machine that already has real configs where the symlinks go, use
 `--adopt`: each one is backed up to `<name>.pre-dotfiles.<timestamp>` and
 replaced with a link to the repo copy.
 
+The one exception is a dangling symlink — a link whose target no longer
+exists, which is what every link becomes when the repo is moved or renamed.
+There is nothing to preserve, so re-running the installer repoints it at the
+repo copy without `--adopt` and without a backup.
+
 Run it **inside WSL**, not Git Bash. Git Bash silently copies instead of
 symlinking unless Windows Developer Mode is on, which looks like success but
 means your edits never reach the repo. The installer detects this and stops.

@@ -8,7 +8,7 @@
 #   bin/agent-job.sh "bump the changelog from this week's commits" --dir ~/myproject
 #
 # Exit code: 0 on success, non-zero on error. Wrap in cron TMUX, e.g.:
-#   0 9 * * * /home/you/workflow/bin/agent-job.sh "morning status" --dir ~/project >> ~/agent-cron.log 2>&1
+#   0 9 * * * /home/you/dotfiles/bin/agent-job.sh "morning status" --dir ~/project >> ~/agent-cron.log 2>&1
 
 set -euo pipefail
 

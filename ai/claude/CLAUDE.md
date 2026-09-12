@@ -8,7 +8,7 @@ files override anything here.
 - Primary machine is Windows 11 with WSL2 (RHEL 9.4 default, Ubuntu 22.04).
   Shell scripts target bash; the Windows side runs PowerShell. Check which side
   a path lives on before assuming a separator.
-- Dotfiles live in `~/Projects/Workflow` and are symlinked into `$HOME` by
+- Dotfiles live in `~/Projects/dotfiles` and are symlinked into `$HOME` by
   `bin/install.sh`. Editing `~/.bashrc` edits the repo — commit the change.
 - Machine-specific shell settings belong in `~/.agentrc.local` (untracked), not
   in the tracked `shell/.bashrc`.
