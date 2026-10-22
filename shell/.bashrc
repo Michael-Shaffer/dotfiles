@@ -132,6 +132,37 @@ if ! shopt -oq posix; then
 fi
 export PATH="$HOME/.local/bin:$PATH"
 
+# WSL appends every folder on the Windows PATH (41 here, some listed three
+# times). ble.sh looks the typed command up across all of them on Enter, and
+# each lookup into /mnt/c is slow: ~350ms before ANY command's output showed.
+# Keep only the Windows tools used from Linux (clip.exe/cmd.exe, explorer.exe,
+# powershell.exe, code, cursor, obsidian.exe for .agentrc) and drop duplicates.
+# Anything else on the Windows side still runs by its full /mnt/c path.
+if [ -n "${WSL_DISTRO_NAME-}" ]; then
+    _path=
+    IFS=: read -ra _dirs <<< "$PATH"
+    for _d in "${_dirs[@]}"; do
+        case $_d in
+            /mnt/[a-z]/*)
+                case ${_d,,} in
+                    */windows|*/windows/system32|*/windowspowershell/v1.0) ;;
+                    */microsoft\ vs\ code/bin|*/cursor/resources/app/bin|*/programs/obsidian) ;;
+                    *) continue ;;
+                esac ;;
+        esac
+        case :$_path: in *:"$_d":*) continue ;; esac
+        _path=${_path:+$_path:}$_d
+    done
+    PATH=$_path
+    unset _path _dirs _d
+fi
+
+# No "did you mean to install..." lookup on a mistyped command. Ubuntu's
+# command-not-found (and RHEL's PackageKit equivalent) start a package search
+# that took ~0.8s per typo under WSL; plain bash prints its own one-line
+# "command not found" once the handler is gone.
+unset -f command_not_found_handle
+
 # Shortened file paths (WSL2 paths can get gangly)
 PROMPT_DIRTRIM=2
 
