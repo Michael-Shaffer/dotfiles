@@ -206,6 +206,12 @@ if [[ ${BLE_VERSION-} ]]; then
     ble-face auto_complete=fg=8
     bleopt complete_auto_delay=300
 
+    # No syntax colouring of the command line. Its defaults put unknown
+    # commands (and half-typed ones, until the word is finished) on a solid
+    # red background and coloured builtins red, so it read as a spell checker
+    # nagging mid-word. ble.sh still provides suggestions and completion.
+    bleopt highlight_syntax=
+
     ble-attach
     __PROMPT_GAP_ARMED=1
 fi
