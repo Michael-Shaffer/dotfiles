@@ -155,6 +155,10 @@ if [ -n "${WSL_DISTRO_NAME-}" ]; then
     done
     PATH=$_path
     unset _path _dirs _d
+
+    # Open links (gh auth login, etc.) in the Windows default browser. WSL
+    # has no Linux browser; wslview (apt package wslu) hands the URL over.
+    export BROWSER=wslview
 fi
 
 # No "did you mean to install..." lookup on a mistyped command. Ubuntu's
