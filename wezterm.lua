@@ -131,6 +131,27 @@ config.mouse_bindings = {
 config.keys = {
   { key = "Insert", mods = "CTRL", action = wezterm.action.CopyTo("Clipboard") },
   { key = "Insert", mods = "SHIFT", action = wezterm.action.PasteFrom("Clipboard") },
+  -- Ctrl+C / Ctrl+V the way the rest of Windows works, as Windows Terminal
+  -- does it. Ctrl+C copies only when WezTerm has a selection; with nothing
+  -- selected it still sends ^C, so interrupting a command keeps working.
+  -- Ctrl+V gives up the shell's rarely used ^V (insert next key literally) and
+  -- nvim's visual-block key, which nvim also has on Ctrl+Q.
+  -- Bound by PHYSICAL key: with a plain key = "v" binding, Ctrl+V did nothing
+  -- on Windows (WezTerm 20240203) while Shift+Insert pasted — most likely
+  -- because Ctrl+letter arrives already turned into its control character.
+  {
+    key = "phys:C",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, pane)
+      if window:get_selection_text_for_pane(pane) ~= "" then
+        window:perform_action(wezterm.action.CopyTo("Clipboard"), pane)
+        window:perform_action(wezterm.action.ClearSelection, pane)
+      else
+        window:perform_action(wezterm.action.SendKey({ key = "c", mods = "CTRL" }), pane)
+      end
+    end),
+  },
+  { key = "phys:V", mods = "CTRL", action = wezterm.action.PasteFrom("Clipboard") },
   -- Pick which distro to open a tab in, without touching this file.
   {
     key = "d",
