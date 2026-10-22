@@ -12,11 +12,12 @@
 # ~78 spaces to align nothing, on every prompt. That whitespace also got swept
 # into any selection. Exit codes now sit inline, next to what you're reading.
 #
-# Two lines joined by a ╭─ / ╰─ frame: context on top, λ and the command below.
+# Two lines joined by a ╭─ / ╰─ frame: context on top, the command below. No
+# OS icon and no prompt glyph — the ╰─ itself is the prompt (see [character]).
 # The frame is box-drawing Unicode, so it needs no Nerd Font.
 format = """
-[╭─](bright-black) $os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status
-[╰─](bright-black)$character"""
+[╭─](bright-black) $username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status
+$character"""
 
 # No blank row before each prompt. Starship defaults this to true; it buys
 # separation between command blocks in dense scrollback, but costs a row at the
@@ -24,12 +25,13 @@ format = """
 # [table] below — put back as `add_newline = true` if the separation is missed.
 add_newline = false
 
-# λ is plain Unicode, so it renders without the Nerd Font fallback. Note that a
-# literal $ here would need escaping ('[\$](bold green)') — bare [$] parses as a
-# variable reference, logs a warning to stderr, and silently drops the character.
+# The bottom of the frame doubles as the prompt symbol: dim after success, red
+# after a failed command, so the exit state is still visible without a glyph.
+# Note that a literal $ here would need escaping ('[\$](bold green)') — bare [$]
+# parses as a variable reference, logs a warning, and silently drops the character.
 [character]
-success_symbol = "[λ](bold bright-green)"
-error_symbol = "[λ](bold red)"
+success_symbol = "[╰─](bright-black)"
+error_symbol = "[╰─](bold red)"
 
 [directory]
 truncation_length = 3
@@ -73,8 +75,10 @@ symbol = " "
 min_time = 2000
 format = "took [$duration]($style) "
 
+# Off: the distro icon read as noise. The symbol table stays so it can come
+# back with `disabled = false` and `$os` in the format.
 [os]
-disabled = false
+disabled = true
 style = "bright-black"
 [os.symbols]
 AIX = " "
