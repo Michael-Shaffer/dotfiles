@@ -18,9 +18,22 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "extraKnownMarketplaces": {
+    "typesafe-ai": {
+      "source": {
+        "source": "github",
+        "repo": "typesafe-ai/skills"
+      }
+    }
+  },
+  "outputStyle": "Concise",
   "sandbox": {
     "enabled": false
   },
   "agentPushNotifEnabled": true,
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "enableWorkflows": true,
+  "enabledPlugins": {
+    "typesafe@typesafe-ai": true
+  }
 }
