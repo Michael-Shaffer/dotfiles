@@ -176,6 +176,18 @@ install_neovim() {
   echo "  ~ installed $("$HOME/.local/bin/nvim" --version | head -n1) -> ~/.local/bin/nvim"
 }
 
+# uv (Python versions, venvs, packages) from Astral's official installer, into
+# ~/.local/bin. UV_NO_MODIFY_PATH keeps it out of .bashrc, which already puts
+# ~/.local/bin on PATH and sets up completion. Upgrade later with: uv self update
+install_uv() {
+  if command -v uv >/dev/null || [ -x "$HOME/.local/bin/uv" ]; then
+    echo "  ~ uv already installed ($("$(command -v uv || echo "$HOME/.local/bin/uv")" --version))"
+    return
+  fi
+  curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
+  echo "  ~ installed $("$HOME/.local/bin/uv" --version) -> ~/.local/bin/uv"
+}
+
 install_tools() {
   local tools="git curl starship nvim fzf"
 
@@ -213,8 +225,10 @@ install_tools() {
       install_neovim
       ;;
 
-    *) echo "Unsupported OS for auto-install: $os" ;;
+    *) echo "Unsupported OS for auto-install: $os"; return ;;
   esac
+
+  install_uv
 }
 
 if [ "$INSTALL_TOOLS" -eq 1 ]; then

@@ -184,6 +184,12 @@ if [ -x "$(command -v starship)" ]; then
     eval "$(starship init bash)"
 fi
 
+# uv / uvx tab completion (uv comes from bin/install.sh).
+if [ -x "$(command -v uv)" ]; then
+    eval "$(uv generate-shell-completion bash)"
+    eval "$(uvx --generate-shell-completion bash)"
+fi
+
 # ---------------------------------------------------------------------------
 # Blank line BETWEEN command blocks, but not above the first prompt on a fresh
 # or just-cleared screen.
