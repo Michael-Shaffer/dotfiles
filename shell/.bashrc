@@ -199,12 +199,24 @@ __prompt_gap() {
     [ -n "${__PROMPT_GAP_ARMED-}" ] && printf '\n'
     __PROMPT_GAP_ARMED=1
 }
+
+# Tell the terminal which folder the shell is in (OSC 7). WezTerm opens new
+# tabs there and names the tab after it; without this it only knew the
+# Windows folder it was launched from, so new tabs landed in /mnt/c/Users/...
+__osc7_cwd() {
+    printf '\e]7;file://%s%s\e\\' "$HOSTNAME" "${PWD// /%20}"
+}
+
+__precmd() {
+    __prompt_gap
+    __osc7_cwd
+}
 # Hook via starship_precmd_user_func, NOT PROMPT_COMMAND. Starship's own init
 # warns that appending to PROMPT_COMMAND breaks exit-status ($?) checking and
 # prepending breaks the cmd_duration module; this hook is called from inside
 # starship_precmd at the right moment, after $? is restored and before PS1 is
 # built, so it sidesteps both.
-starship_precmd_user_func="__prompt_gap"
+starship_precmd_user_func="__precmd"
 
 # `clear` as a function so it resets the flag too; `command clear` still works.
 clear() { command clear "$@"; unset __PROMPT_GAP_ARMED; }

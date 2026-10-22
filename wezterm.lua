@@ -73,18 +73,45 @@ config.enable_tab_bar = true
 -- so it must stay visible or the window can't be dragged (drag from empty
 -- space in the bar; Ctrl-Shift-drag also works).
 config.hide_tab_bar_if_only_one_tab = false
--- Flat "retro" bar so it takes the palette below instead of the stock
--- gradient. The active tab is marked by colour, not a bright block.
-config.use_fancy_tab_bar = false
+-- The "fancy" bar: the only one with a close (x) button on each tab. The
+-- active tab takes the terminal's own background so it reads as joined to
+-- the page below; the rest sit back in the darker bar.
+config.use_fancy_tab_bar = true
 config.tab_max_width = 28
+config.window_frame = {
+  font = wezterm.font({ family = "Red Hat Mono", weight = "Medium" }),
+  font_size = 10.5,
+  active_titlebar_bg = "#16161d", -- sumiInk0
+  inactive_titlebar_bg = "#16161d",
+}
 config.colors.tab_bar = {
-  background = "#16161d", -- sumiInk0
-  active_tab = { bg_color = "#2a2a37", fg_color = "#e6c384", intensity = "Bold" },
+  background = "#16161d",
+  inactive_tab_edge = "#16161d",
+  active_tab = { bg_color = "#1f1f28", fg_color = "#e6c384" },
   inactive_tab = { bg_color = "#16161d", fg_color = "#727169" },
   inactive_tab_hover = { bg_color = "#223249", fg_color = "#dcd7ba" },
   new_tab = { bg_color = "#16161d", fg_color = "#727169" },
   new_tab_hover = { bg_color = "#223249", fg_color = "#dcd7ba" },
 }
+
+-- Tab text: number and folder ("2  TrackIt"). Every WSL tab's process is
+-- wslhost.exe, so the default title said nothing. The folder comes from the
+-- OSC 7 report shell/.bashrc sends at each prompt. Until that first prompt
+-- WezTerm only knows the Windows folder wsl.exe started in (C:\Users\micha,
+-- so a new tab flashed "micha"). Show "~" until then: new shells start there,
+-- so in the usual case the real report changes nothing you can see.
+local function tab_folder(tab)
+  local cwd = tab.active_pane.current_working_dir
+  local path = cwd and cwd.file_path or ""
+  if path:match("^/?%a:[/\\]") or path:match("^/home/[^/]+/?$") then
+    return "~"
+  end
+  return path:gsub("/+$", ""):match("([^/]+)$") or "~"
+end
+
+wezterm.on("format-tab-title", function(tab)
+  return " " .. (tab.tab_index + 1) .. "  " .. tab_folder(tab) .. " "
+end)
 -- Unfocused splits fade back so the active one is obvious.
 config.inactive_pane_hsb = { saturation = 0.8, brightness = 0.7 }
 -- Steady 2px underline: a blinking solid block hid the letter under it and
