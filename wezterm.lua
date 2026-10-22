@@ -34,9 +34,10 @@ config.window_padding = { left = 16, right = 16, top = 12, bottom = 8 }
 config.colors = {
   foreground = "#dcd7ba", -- fujiWhite
   background = "#1f1f28", -- sumiInk3
-  cursor_bg = "#c8c093",
-  cursor_fg = "#1f1f28",
-  cursor_border = "#c8c093",
+  -- Muted sumiInk6 underline: marks the cell without covering the letter.
+  cursor_bg = "#54546d",
+  cursor_fg = "#dcd7ba",
+  cursor_border = "#54546d",
   selection_bg = "#2d4f67", -- waveBlue2
   selection_fg = "#c8c093",
   scrollbar_thumb = "#16161d",
@@ -86,8 +87,10 @@ config.colors.tab_bar = {
 }
 -- Unfocused splits fade back so the active one is obvious.
 config.inactive_pane_hsb = { saturation = 0.8, brightness = 0.7 }
-config.cursor_blink_rate = 500
-config.default_cursor_style = "BlinkingBlock"
+-- Steady 2px underline: a blinking solid block hid the letter under it and
+-- kept pulling the eye. Programs (nvim) can still set their own shape.
+config.default_cursor_style = "SteadyUnderline"
+config.cursor_thickness = "2px"
 
 -- ---------------------------------------------------------------------------
 -- Practical bits
