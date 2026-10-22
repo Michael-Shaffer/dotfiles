@@ -143,6 +143,39 @@ fi
 # ---------------------------------------------------------------------------
 # Package installation per platform
 # ---------------------------------------------------------------------------
+# Neovim from the official release tarball, into ~/.local (no sudo). Used where
+# the distro copy is missing or too old — Ubuntu 22.04's apt ships 0.6, which
+# modern plugins refuse to load on. Re-running upgrades to the latest release.
+install_neovim() {
+  local arch minor
+  if command -v nvim >/dev/null; then
+    minor="$(nvim --version | head -n1 | sed -n 's/^NVIM v0\.\([0-9]*\).*/\1/p')"
+    if [ -z "$minor" ] || [ "$minor" -ge 10 ]; then
+      echo "  ~ nvim already installed ($(nvim --version | head -n1))"
+      return
+    fi
+    echo "  ! $(nvim --version | head -n1) is too old; installing the official release"
+  fi
+
+  case "$(uname -m)" in
+    x86_64) arch=x86_64 ;;
+    aarch64|arm64) arch=arm64 ;;
+    *) echo "  ! no Neovim release for $(uname -m); install it yourself"; return ;;
+  esac
+
+  local url="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$arch.tar.gz"
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  curl -fsSL "$url" -o "$tmp_dir/nvim.tar.gz"
+  rm -rf "$HOME/.local/opt/nvim"
+  mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+  tar -xzf "$tmp_dir/nvim.tar.gz" -C "$tmp_dir"
+  mv "$tmp_dir/nvim-linux-$arch" "$HOME/.local/opt/nvim"
+  rm -rf "$tmp_dir"
+  ln -sfn "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+  echo "  ~ installed $("$HOME/.local/bin/nvim" --version | head -n1) -> ~/.local/bin/nvim"
+}
+
 install_tools() {
   local tools="git curl starship nvim fzf"
 
@@ -176,6 +209,8 @@ install_tools() {
       if ! command -v starship >/dev/null; then
         confirm "Install Starship?" && curl -sS https://starship.rs/install.sh | sh
       fi
+
+      install_neovim
       ;;
 
     *) echo "Unsupported OS for auto-install: $os" ;;
