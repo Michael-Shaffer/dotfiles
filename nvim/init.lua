@@ -22,15 +22,14 @@ end
 
 require("lazy").setup({
   { "folke/tokyonight.nvim", priority = 1000 },
-  -- Catppuccin to match terminal + Starship.
+  -- Kanagawa to match terminal + Starship.
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "rebelot/kanagawa.nvim",
     priority = 1000,
     lazy = false,
     config = function()
-      require("catppuccin").setup({ flavour = "mocha", transparent_background = true })
-      vim.cmd.colorscheme("catppuccin")
+      require("kanagawa").setup({ theme = "wave", transparent = true })
+      vim.cmd.colorscheme("kanagawa")
     end,
   },
 
