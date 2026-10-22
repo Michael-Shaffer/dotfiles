@@ -27,6 +27,11 @@
         "--frozen",
         "anki-mcp"
       ]
+    },
+
+    "trackit": {
+      "command": "C:\\Windows\\System32\\wsl.exe",
+      "args": ["-d", "Ubuntu-22.04", "--exec", "/home/shaffem/.local/bin/trackit-mcp-bridge"]
     }
   }
 }
