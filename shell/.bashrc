@@ -199,6 +199,13 @@ fi
 # Arming here spends that allowance on the prompt ble.sh already drew. Plain
 # bash runs PROMPT_COMMAND before its first prompt, so it needs no help.
 if [[ ${BLE_VERSION-} ]]; then
+    # Autosuggestions as dim ghost text. ble.sh's default face (fg=238,bg=254)
+    # is built for light terminals and shows as a bright grey box on Kanagawa;
+    # colour 8 is the palette's bright-black, so this follows the theme. The
+    # delay stops suggestions flickering in and out while typing.
+    ble-face auto_complete=fg=8
+    bleopt complete_auto_delay=300
+
     ble-attach
     __PROMPT_GAP_ARMED=1
 fi
