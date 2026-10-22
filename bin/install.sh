@@ -8,12 +8,16 @@
 #         ./install.sh --adopt      (replace existing files with symlinks, backing them up)
 #         ./install.sh --all
 #
-# Safe by default: it never overwrites an existing symlink/target and asks
-# before installing packages. Toggle each with --yes.
+# Safe by default: it never overwrites a real file or a symlink that still
+# resolves, and asks before installing packages. Toggle each with --yes.
 #
 # --adopt is for the first run on a machine that already has real config files
 # where the symlinks should go. It backs each one up and links the repo copy in
 # its place. Without it those paths are skipped and the repo copy does nothing.
+#
+# Dangling symlinks are the exception: a link whose target is gone (typically
+# because the repo was moved or renamed since the last install) has nothing
+# worth keeping, so it is relinked in place — no --adopt, no backup.
 
 set -euo pipefail
 
@@ -54,6 +58,19 @@ link() {
   # Already pointing at the repo: nothing to do.
   if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
     echo "  = ok    $dst"
+    return
+  fi
+
+  # Dangling symlink: the target is gone (the repo was moved, say), so there is
+  # nothing to preserve. Replace it in place — no --adopt, no backup. readlink
+  # is only for the message; under Git Bash it prints the Windows target as a
+  # POSIX path, which is fine.
+  if [ -L "$dst" ] && [ ! -e "$dst" ]; then
+    local old
+    old="$(readlink "$dst")"
+    rm "$dst"
+    ln -s "$src" "$dst"
+    echo "  ~ relinked $dst (was dangling -> $old)"
     return
   fi
 

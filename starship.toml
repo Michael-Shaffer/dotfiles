@@ -2,15 +2,21 @@
 # Shared across bash, zsh, fish on every OS. Lives in the dotfiles repo,
 # symlinked to ~/.config/starship.toml
 #
-# Based on Catppuccin Mocha colours with Nerd Font symbols to match the terminal
-# + nvim. Additional Nerd Font symbols ((nerd-font-symbols preset) appended below.
+# Kanagawa colours (set in wezterm.lua) with Nerd Font symbols. Every style
+# below is an ANSI colour NAME, so the prompt follows the terminal palette.
+# Additional Nerd Font symbols (nerd-font-symbols preset) appended below.
 
 # Top-level format lives BEFORE every section so it applies to the whole prompt.
 # No $fill before $status. $fill pads to the right window edge so $status lands
 # there — but $status is empty after every successful command, so it was padding
 # ~78 spaces to align nothing, on every prompt. That whitespace also got swept
 # into any selection. Exit codes now sit inline, next to what you're reading.
-format = "$os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status$line_break$character"
+#
+# Two lines joined by a ╭─ / ╰─ frame: context on top, λ and the command below.
+# The frame is box-drawing Unicode, so it needs no Nerd Font.
+format = """
+[╭─](bright-black) $os$username$hostname$directory$git_branch$git_status$python$nodejs$package$cmd_duration$status
+[╰─](bright-black)$character"""
 
 # No blank row before each prompt. Starship defaults this to true; it buys
 # separation between command blocks in dense scrollback, but costs a row at the
@@ -22,26 +28,26 @@ add_newline = false
 # literal $ here would need escaping ('[\$](bold green)') — bare [$] parses as a
 # variable reference, logs a warning to stderr, and silently drops the character.
 [character]
-success_symbol = "[λ](bold green)"
+success_symbol = "[λ](bold bright-green)"
 error_symbol = "[λ](bold red)"
 
 [directory]
 truncation_length = 3
 truncation_symbol = "…/"
-style = "bold green"
+style = "bold blue"
 
-# Context (os, branch, counts) sits in ANSI "bright black" — #8ca391 in the
-# WezTerm scheme, a muted sage. Using colour NAMES rather than hex means the
-# prompt follows the terminal theme instead of drifting from it.
+# Using colour NAMES rather than hex means the prompt follows the terminal
+# theme instead of drifting from it: magenta is Kanagawa's oniViolet.
 [git_branch]
 symbol = " "
-style = "bright-black"
+style = "magenta"
+format = "[on](bright-black) [$symbol$branch(:$remote_branch)]($style) "
 
 # Count first, then what it is: "2Δ" reads as "two modified". Δ is the standard
 # notation for change; the rest of the family uses git's own status letters
 # where it has them (? for untracked, R for renamed) so nothing needs decoding.
 [git_status]
-style = "green"
+style = "bright-yellow"
 format = "[$all_status$conflicted$ahead_behind]($style) "
 modified = "${count}Δ "
 staged = "${count}+ "
