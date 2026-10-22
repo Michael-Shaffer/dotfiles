@@ -125,6 +125,17 @@ config.cursor_thickness = "2px"
 config.scrollback_lines = 10000
 config.audible_bell = "Disabled" -- no beep
 
+-- Close tabs without "really close?". WezTerm skips the prompt for shells it
+-- recognises, and only if EVERY process in the tab's tree is on this list.
+-- From Windows a WSL tab is wsl.exe -> wsl.exe -> wslhost.exe -> conhost.exe,
+-- so every tab asked. The cost: WezTerm can't see what runs inside WSL, so
+-- closing a tab mid-build won't warn either (tmux sessions survive it).
+config.skip_close_confirmation_for_processes_named = {
+  "bash", "sh", "zsh", "fish", "tmux", "nu",
+  "cmd.exe", "pwsh.exe", "powershell.exe",
+  "wsl.exe", "wslhost.exe", "conhost.exe",
+}
+
 -- No `copy_on_select` option exists in WezTerm; setting one is a hard config
 -- error. Selecting already copies: WezTerm's default binding completes the
 -- selection on mouse-up, and the Shift bindings below send it to the OS
