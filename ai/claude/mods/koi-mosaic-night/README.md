@@ -4,7 +4,7 @@ A Claude Code mod: the Koi Mosaic backdrop from Anthropic's `theme-examples`
 plugin, recoloured for dark windows. The two koi, lily pads and swim motion are
 unchanged; the water is night teal, the stones moonlit, and the ripples glow
 turquoise like bioluminescence. The orange koi's eye tiles are orange so it
-reads as one colour, with small round pupils. Ripples come in several sizes.
+has solid black eyes. Ripples come in several sizes.
 
 ## Use
 
