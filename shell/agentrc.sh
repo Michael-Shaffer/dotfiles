@@ -46,13 +46,5 @@ fi
 # Obsidian CLI on the Windows host.
 command -v obsidian.exe >/dev/null 2>&1 && alias obsidian="obsidian.exe"
 
-# -- claude / cl wrappers (only if the base binary exists) -----------------
-__claude="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
-if [ -x "$__claude" ]; then
-  claude() { CLAUDE_CONFIG_DIR="$HOME/.claude-pro" command "$__claude" "$@"; }
-  cl()     { CLAUDE_CONFIG_DIR="$HOME/.claude-max" command "$__claude" "$@"; }
-fi
-unset __claude
-
 # -- personal, untracked overlay (edit freely; survives every re-install) --
 [ -f "$HOME/.agentrc.local" ] && . "$HOME/.agentrc.local"
