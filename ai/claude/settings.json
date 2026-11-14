@@ -35,5 +35,8 @@
   "enableWorkflows": true,
   "enabledPlugins": {
     "typesafe@typesafe-ai": true
+  },
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/Projects/dotfiles/ai/claude/mods/koi-mosaic-night"
   }
 }
