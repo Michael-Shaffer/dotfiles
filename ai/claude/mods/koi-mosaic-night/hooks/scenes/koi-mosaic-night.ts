@@ -75,6 +75,7 @@ const KOI_FILLS: Record<string, readonly string[]> = {
   C: ['#d14a3a', '#c03d2e', '#d85544'],
   K: ['#48545b', '#3b464c', '#55626b'],
   E: ['#030607', '#030607', '#030607'],
+  e: ['#ec7c3c', '#e06c2e', '#d55f25'],
   f: ['#f5f1e6', '#ece7d9', '#f8f5ec'],
   t: ['#f5f1e6', '#ece7d9', '#f8f5ec'],
   T: ['#f5f1e6', '#ece7d9', '#f8f5ec'],
@@ -92,11 +93,11 @@ const KOHAKU_BODY = `
 ....ff..............
 ...fff..............
 ..WOOO..............
-.OOOOOOWWW..........
+.eOOOOOWWW..........
 WOOOOOOWWWOOOWW.....
 WWOOOOOWWOOOOOW.....
 WOOOOOWWWWOOOWW.....
-.OWOOOOWWW..........
+.eWOOOOWWW..........
 ..WWWO..............
 ...fff..............
 ....ff..............
@@ -148,6 +149,8 @@ const LEFT_LANE: readonly Point[] = [[9, 56], [11, 36], [10, 18], [12, -6]]
 
 /** A wake beside each lane: the step it sits at, and how far to the side. */
 const WAKES: readonly Point[] = [[40, 5], [82, -4]]
+/** A koi's wake is small beside the pond's own ripples. */
+const WAKE_SCALE = 0.7
 
 /** How much brighter the night rings are than the day ones: turquoise light on dark water. */
 const RING_GLOW = 3.2
@@ -226,6 +229,8 @@ function sliceTiles(tiles: readonly Tile[], sliceIndex: number): string {
   }
   let out = ''
   for (const [shade, d] of byShade) out += `<path class="k${shade}" d="${d}"/>`
+  // An eye tile ('e') is the body's colour with a small round pupil, so the eye reads without a dark patch.
+  for (const tile of tiles) if (tile.kind === 'e') out += `<circle class="kp" cx="${tile.across * CELL}" cy="0" r="3.5"/>`
   for (const glyphClass of GLYPH_CLASSES) {
     const marked = tiles.filter(tile => glyphClass.kinds.includes(tile.kind))
     if (marked.length === 0) continue
@@ -407,8 +412,8 @@ function ringOutline(centerX: number, centerY: number, radius: number): string {
 }
 
 /** Four rings that show one after another, each fainter, then nothing for the rest of the period. */
-function ripple(centerX: number, centerY: number, seconds: number, delaySeconds: number, family: string): string {
-  return [1.8, 3.6, 5.3, 7].map((radius, i) => `<path class="ring ${family}${i}" style="animation-duration:${seconds}s;animation-delay:-${delaySeconds.toFixed(2)}s" d="${ringOutline(centerX, centerY, radius)}"/>`).join('')
+function ripple(centerX: number, centerY: number, seconds: number, delaySeconds: number, family: string, scale = 1): string {
+  return [1.8, 3.6, 5.3, 7].map((radius, i) => `<path class="ring ${family}${i}" style="animation-duration:${seconds}s;animation-delay:-${delaySeconds.toFixed(2)}s" d="${ringOutline(centerX, centerY, radius * scale)}"/>`).join('')
 }
 
 /** The rings' fade, squeezed into the first `fraction` of the period: a long period can then hold one short ripple. */
@@ -421,7 +426,7 @@ function wakeRipple(steps: readonly Step[], seconds: number, wakeStep: number, s
   const stepSeconds = seconds / steps.length
   const delay = ((((startStep - wakeStep) % steps.length) + steps.length) % steps.length) * stepSeconds
   const at = steps[wakeStep] ?? { x: 0, y: 0 }
-  return ripple(at.x + shiftX, at.y, seconds, delay, 'turn')
+  return ripple(at.x + shiftX, at.y, seconds, delay, 'turn', WAKE_SCALE)
 }
 
 function floatingPad(cells: readonly Cell[], className: string, seconds: number, delay: number): string {
@@ -443,7 +448,7 @@ export function koiMosaicNightSvg(): string {
   const style = `
 text{font:700 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-anchor:middle}
 ${Object.entries(KOI_FILLS).map(([kind, fills]) => fills.map((fill, i) => `.k${kind}${i}{fill:${fill}${KOI_OPACITY[kind] === undefined ? '' : `;opacity:${KOI_OPACITY[kind]}`}}`).join('')).join('')}
-.fish path{stroke:#00070b;stroke-opacity:.3}.kg{fill:#fff1dc;opacity:.5}.kw{fill:#b7c3bd;opacity:.8}
+.fish path{stroke:#00070b;stroke-opacity:.3}.kg{fill:#fff1dc;opacity:.5}.kp{fill:#1a0c05}.kw{fill:#b7c3bd;opacity:.8}
 .swim{animation:swim ${seconds}s linear infinite}
 .poseA{animation:flipA 3.2s linear infinite}.poseB{animation:flipB 3.2s linear infinite}
 .rockX{animation:rockX 37s ease-in-out infinite}.rockY{animation:rockY 41s ease-in-out infinite}
@@ -477,7 +482,7 @@ ${swimKeyframes('swim', steps)}
 ${[28, 24, 20, 16, 12].map(radius => stairZone(86, 56, radius, 1.1, 0.045, '#010a0f')).join('')}${[27, 23, 19, 15, 11].map(radius => stairZone(-4, -4, radius, 1.3, 0.04, '#010a0f')).join('')}${stairZone(84, -6, 18, 1.2, 0.05, '#010a0f')}
 <rect width="1600" height="1000" fill="url(#grid)" mask="url(#outward)"/>
 ${WAKES.map(([step, shift]) => wakeRipple(steps, seconds, step, kohakuStart, shift) + wakeRipple(steps, seconds, step, tanchoStart, shift)).join('')}
-${ripple(73, 29, 29, 4, 'slow')}${ripple(11, 14, 37, 20, 'slow')}${ripple(72, 46, 43, 31, 'slow')}${ripple(11, 43, 31, 9, 'slow')}
+${ripple(73, 29, 29, 4, 'slow', 1.35)}${ripple(11, 14, 37, 20, 'slow', 0.75)}${ripple(72, 46, 43, 31, 'slow', 1)}${ripple(11, 43, 31, 9, 'slow', 1.6)}${ripple(5, 27, 23, 14, 'slow', 0.5)}${ripple(77, 11, 19, 6, 'slow', 0.55)}
 ${fishLayer(steps, seconds, kohakuStart, tanchoStart, 'shade', ' transform="translate(40 40)" fill="#00070b" opacity="0.14"')}${fishLayer(steps, seconds, kohakuStart, tanchoStart, 'shade', ' transform="translate(20 20)" fill="#00070b" opacity="0.26"')}
 ${fishLayer(steps, seconds, kohakuStart, tanchoStart, 'fish', '')}
 ${halo(stones, 1, 0, 0, 0.22)}${mosaic(stones)}
